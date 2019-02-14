@@ -4,10 +4,8 @@ import sys
 import numpy as np
 from rectangle import intersection_over_union
 from pathlib import Path
+from defaults import parkingSpot
 
-
-# Parking Spot
-parkingSpot = [185, 185, 185+85, 185+85]
 
 # Initialize the parameters
 confThreshold = 0.5  # Confidence threshold

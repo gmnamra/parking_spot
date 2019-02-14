@@ -11,7 +11,7 @@ BASEURL = 'https://hiring.verkada.com/video'
 
 
 
-class analyze_cars:
+class analyzecars:
 
     def __init__(self, base_url, index_url, first_index, last_index):
         self.base_url = base_url
@@ -59,7 +59,7 @@ def main():
 
     args = parser.parse_args()
 
-    place = analyze_cars(BASEURL, args.index, args.start, args.end)
+    place = analyzecars(BASEURL, args.index, args.start, args.end)
 
 
 if __name__ == '__main__':
