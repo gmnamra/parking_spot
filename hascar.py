@@ -5,7 +5,7 @@ import numpy as np
 from rectangle import intersection_over_union
 from pathlib import Path
 from defaults import parkingSpot
-
+import match
 
 # Initialize the parameters
 confThreshold = 0.5  # Confidence threshold
@@ -64,6 +64,8 @@ def drawPred(frame, classId, conf, iou, left, top, right, bottom):
 def postprocess(frame, outs, parkingSpot, show):
     frameHeight = frame.shape[0]
     frameWidth = frame.shape[1]
+    parkingSpot_width = parkingSpot[3] - parkingSpot[1]
+    parkingSpot_height = parkingSpot[2] - parkingSpot[0]
 
     # Scan through all the bounding boxes output from the network and keep only the
     # ones with high confidence scores. Assign the box's class label as the class with the highest score.
@@ -81,6 +83,7 @@ def postprocess(frame, outs, parkingSpot, show):
                 center_y = int(detection[1] * frameHeight)
                 width = int(detection[2] * frameWidth)
                 height = int(detection[3] * frameHeight)
+
                 left = int(center_x - width / 2)
                 top = int(center_y - height / 2)
                 bbox = [left, top, left + width, top + height]
@@ -88,7 +91,7 @@ def postprocess(frame, outs, parkingSpot, show):
                 if iou < 0.5:
                     continue
 
-                ious.append(ious)
+                ious.append(iou)
                 classIds.append(classId)
                 confidences.append(float(confidence))
                 boxes.append([left, top, width, height])
@@ -145,14 +148,59 @@ def process(filename, show):
     return assessment
 
 
+def compare(filename_a, filename_b, show=False):
+    yolo3_a = process(filename_a, False)
+    yolo3_b = process(filename_b, False)
+    imga = cv.imread(filename_a)
+    imgb = cv.imread(filename_b)
+    # Crop at the spot
+    roi_a = imga[parkingSpot[0]:parkingSpot[2], parkingSpot[1]: parkingSpot[3]]
+    roi_b = imgb[parkingSpot[0]:parkingSpot[2], parkingSpot[1]: parkingSpot[3]]
+    mi_a, h_a = match.LabMutualInformation(roi_a)
+    mi_b, h_b = match.LabMutualInformation(roi_b)
+
+    r = match.correlate(h_a, h_b)
+    if show:
+        match.mi_lab(roi_a, roi_b)
+
+    roi_a_wider = imga[parkingSpot[0]-5:parkingSpot[2]+5, parkingSpot[1]-5: parkingSpot[3]+5]
+    res = match.find_template(roi_a_wider,roi_b)
+
+    return yolo3_a and yolo3_b and res[1] > 0.5
+
+
+
+
+
+
 if __name__ == '__main__':
 
-    image_filename = '1538076003.png'
-    if len(sys.argv) >= 2 and Path(sys.argv[1]).is_file() and Path(sys.argv[1]).exists():
-        image_filename = sys.argv[1]
-    show = True
-    found = process(image_filename,show)
-    if not found:
-        print('no car detected')
-    else:
-        print('car detected')
+    # image_filename_a = 'test_data/1538076223.jpg'
+    # image_filename_b = 'test_data/1538077514.jpg'
+    # compare(image_filename_a, image_filename_b)
+
+    show = False
+    files = []
+    options = []
+
+    for idx, arg in enumerate(sys.argv):
+        if Path(arg).is_file() and Path(arg).exists():
+            files.append(arg)
+        elif arg == 'show':
+            options.append("show")
+
+    show = len(options) == 1
+    if len(files) == 2:
+        found = process(files[1], show)
+        if not found:
+            print('no car detected')
+        else:
+            print('car detected')
+    elif len(files) == 3:
+        is_same = compare(files[1], files[2], show)
+        if not is_same:
+            print('Different Cards')
+        else:
+            print('Same Cars')
+
+

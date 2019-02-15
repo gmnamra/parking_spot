@@ -3,11 +3,30 @@ import numpy as np
 import array
 import random
 import unittest
+from matplotlib import pyplot as plt
+from matplotlib.ticker import NullFormatter
+from skimage import color
+from skimage import exposure
+from skimage import img_as_float
+from skimage import img_as_ubyte
+from skimage import io
+from skimage.io import imsave
 
 
+def mutual_information(hgram):
+    """ Mutual information for joint histogram
+    """
+    # Convert bins counts to probability values
+    pxy = hgram / float(np.sum(hgram))
+    px = np.sum(pxy, axis=1)  # marginal for x over y
+    py = np.sum(pxy, axis=0)  # marginal for y over x
+    px_py = px[:, None] * py[None, :]  # Broadcast to multiply marginals
+    # Now we can do the calculation using the pxy, px_py 2D arrays
+    nzs = pxy > 0  # Only non-zero pxy values contribute to the sum
+    return np.sum(pxy[nzs] * np.log(pxy[nzs] / px_py[nzs]))
 
-def LabImage(image_file):
-    bgr_image = cv2.imread(image_file)
+
+def LabImage(bgr_image):
     h, w, channels = bgr_image.shape
     lab_image = cv.cvtColor(bgr_image, cv.COLOR_BGR2LAB)
     # Split LAB channels
@@ -15,11 +34,9 @@ def LabImage(image_file):
     return (L, a, b)
 
 
-
-def LabJointHistogram(L,a,b):
-
-    print(str(np.min(a)) + '  ' + str(np.average(a)) + '  ' + str(np.max(a)))
-    print(str(np.min(b)) + '  ' + str(np.average(b)) + '  ' + str(np.max(b)))
+def LabJointHistogram(L, a, b):
+    #    print(str(np.min(a)) + '  ' + str(np.average(a)) + '  ' + str(np.max(a)))
+    #    print(str(np.min(b)) + '  ' + str(np.average(b)) + '  ' + str(np.max(b)))
 
     xedges, yedges = np.linspace(np.min(a), np.max(a), 128), np.linspace(np.min(b), np.max(b), 128)
     hist, xedges, yedges = np.histogram2d(a.flatten(), b.flatten(), (xedges, yedges))
@@ -28,11 +45,26 @@ def LabJointHistogram(L,a,b):
     c = hist[xidx, yidx]
     return (a.flatten(), b.flatten(), c)
 
-def find_template(fixed, roi, template):
-    h, w = template.shape
-    roi_window = fixed[roi[0]:roi[1], roi[2]:roi[3]]
 
-    res = cv.matchTemplate(roi_window, template, cv.TM_CCOEFF_NORMED)
+def LabMutualInformation(rgb_image, plotter=None):
+    lab_image = cv.cvtColor(rgb_image, cv.COLOR_RGB2LAB)
+    # Split LAB channels
+    L, a, b = cv.split(lab_image)
+    hist_2d, x_edges, y_edges = np.histogram2d(a.ravel(), b.ravel(), bins=20)
+    mu = mutual_information(hist_2d)
+    if plotter != None:
+        hist_2d_log = np.zeros(hist_2d.shape)
+        non_zeros = hist_2d != 0
+        hist_2d_log[non_zeros] = np.log(hist_2d[non_zeros])
+        plotter.imshow(hist_2d_log.T, origin='lower')
+    return (mu, hist_2d)
+
+
+def find_template(fixed,  template):
+    h, w = template.shape[:2]
+
+
+    res = cv.matchTemplate(fixed, template, cv.TM_CCOEFF_NORMED)
     min_val, max_val, min_loc, max_loc = cv.minMaxLoc(res)
 
     tl = max_loc
@@ -57,27 +89,54 @@ def correlate(cvma, cvmb, mask=None):
         return 0.0
 
     mean_a, stddev_a = cv.meanStdDev(cvma, mask=mask)
-    mean_b, stddev_b = cv.meanStdDev(cvma, mask=mask)
+    mean_b, stddev_b = cv.meanStdDev(cvmb, mask=mask)
     n_pixels = hb * wa
 
-    covar = (cvma - mean_a).dot(cvmb - mean_b) / n_pixels
-    correlation = covar / (stddev_a * stddev_b)
+    cvmaa = cvma - mean_a
+    cvmbb = cvmb - mean_b
+    covar1 = np.sum(cvmaa * cvmbb) / n_pixels
+    correlation = covar1 / (stddev_a * stddev_b)
 
     return correlation
 
 
-
 def make_gauss(centre, amp, sig, shapdim):
-    gauss = np.zeros(shapdim, np.float32)
+    shape = (shapdim[1],shapdim[0],1)
     sidelenx = shapdim[1]
     sideleny = shapdim[0]
-    l = np.zeros(shapdim, np.float32)
+    l = np.zeros(shape, dtype="float32")
 
     for i in range(0, sideleny):
         for j in range(0, sidelenx):
             l[i, j] = np.sqrt((centre[0] - i) ** 2 + (centre[1] - j) ** 2)
     gaussblob = amp * np.exp(-(l ** 2) / sig)
     return gaussblob
+
+
+def mi_lab(imga, imgb):
+    f, axs = plt.subplots(2, 3, figsize=(20, 10), frameon=False,
+                          subplot_kw={'xticks': [], 'yticks': []})
+    axs[0, 0].imshow(imga)
+    axs[0, 1].imshow(imgb)
+
+    (L, a, b) = LabImage(imga)
+
+    (x, y, c) = LabJointHistogram(L, a, b)
+    axs[1, 0].scatter(x, y, marker='.', cmap='PuBu_r')
+    axs[1, 0].set_title(' A ')
+    axs[1, 0].set_xlabel('b')
+    axs[1, 0].set_ylabel('a')
+
+    (LL, aa, bb) = LabImage(imgb)
+
+    (x, y, c) = LabJointHistogram(LL, aa, bb)
+    axs[1, 1].scatter(x, y)
+    axs[1, 1].set_title(' B ')
+    axs[1, 1].set_xlabel('b')
+    axs[1, 1].set_ylabel('a')
+
+    plt.autoscale
+    plt.show()
 
 
 __all__ = ['TestCorrelate']
@@ -94,17 +153,31 @@ class TestCorrelate(unittest.TestCase):
         """
 
     def test_correlate(self):
+        self.test_basic_corr()
         self.test_basic()
+
+    def test_basic_corr(self):
+        g1 = make_gauss([80, 80], 3.14, 0.25, [160, 160])
+        g2 = make_gauss([80, 80], 3.14, 0.25 * 4, [160, 160])
+
+        eps = 0.0000001
+
+        res = correlate(g1, g1)
+
+        self.assertTrue((1.0 - res[0]) < eps)
+
+        res = correlate(g1, g2)
+
+        self.assertTrue(np.fabs(0.80738218 - res[0]) < eps)
 
     def test_basic(self):
         g1 = make_gauss([80, 80], 3.14, 0.5, [160, 160])
         g2 = make_gauss([7, 7], 3.14, 0.5, [16, 16])
         roi = [70, 90, 70, 90]
-        res = find_template(g1, roi, g2)
-        self.assertTrue(res[2] == (3, 3))
-        self.assertTrue(res[3] == (19, 19))
+        res = find_template(g1,  g2)
+        self.assertTrue(res[2] == (83, 64))
+        self.assertTrue(res[3] == (99, 80))
         self.assertAlmostEqual(res[1], 1.0, 4)
-
 
 
 if __name__ == '__main__':

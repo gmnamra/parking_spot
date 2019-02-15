@@ -123,7 +123,7 @@ class TestStatus(unittest.TestCase):
         pp = SpotObserver(pState.UnInitialized, 1538076003)
         self.assertTrue(pp.state() == pState.UnInitialized)
         self.assertEqual(len(pp.records()), 0)
-        result_url = 'test_data/_0.txt'
+        result_url = 'results/_0.txt'
         self.assertTrue(Path(result_url).exists())
         fo = open(result_url, "r+")
         lines = fo.readlines()
