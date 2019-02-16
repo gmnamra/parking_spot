@@ -1,8 +1,11 @@
 # Assignment: Identify cars parked in the spot marked 
 
 ## Sections
-#### Required Steps
-#####Extract Car Using Yolov
+### Required Steps
+#### Extract Car Using Yolov3
+#### Same Car
+#### All together
+
 #### Discussion
 
 
@@ -14,6 +17,6 @@
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTExMjIwMDM1ODksLTEwMDg5MTUyMzIsLT
-ExODA0NTM5NDZdfQ==
+eyJoaXN0b3J5IjpbLTcwNjI1OTUwNywtMTAwODkxNTIzMiwtMT
+E4MDQ1Mzk0Nl19
 -->
