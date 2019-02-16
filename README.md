@@ -2,6 +2,8 @@
 
 ## Sections
 #### Required Steps
+#### Discussion
+
 
 ### Camera Outside Overlooking Street:
  - [x] Rigidly mounted. 
@@ -11,5 +13,6 @@
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTI0NzY4MjM4OCwtMTE4MDQ1Mzk0Nl19
+eyJoaXN0b3J5IjpbLTEwMDg5MTUyMzIsLTExODA0NTM5NDZdfQ
+==
 -->
