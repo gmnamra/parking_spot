@@ -1,7 +1,7 @@
 # Assignment: Identify cars parked in the spot marked 
 
 ## Sections
-### Required Steps
+### Steps
 #### Fetch and Extract
 ##### basic
 ##### Improvements
@@ -26,6 +26,6 @@
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTkzODY4MTk3NSwtMTAwODkxNTIzMiwtMT
-E4MDQ1Mzk0Nl19
+eyJoaXN0b3J5IjpbLTk0NDIzNzEyLC05Mzg2ODE5NzUsLTEwMD
+g5MTUyMzIsLTExODA0NTM5NDZdfQ==
 -->
