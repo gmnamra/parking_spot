@@ -5,6 +5,9 @@ import os
 import requests
 from pathlib import Path
 
+import threading
+import time
+
 
 def arg_parse():
     """
@@ -50,6 +53,22 @@ def fetch_url_first_frame(base_url, filename, download_path, overwrite=False):
                 cv2.imwrite(ff_name, orig_im)
             break
     return (download_fqfn, ff_name)
+
+
+class fetcherThread (threading.Thread):
+   def __init__(self, threadID, base_url, filename, download_path, overwrite=False):
+      threading.Thread.__init__(self)
+      self.threadID = threadID
+      self.base_url = base_url
+      self.name = filename
+      self.downlood_path = download_path
+      self.overwrite = overwrite
+
+
+   def run(self):
+      print ("Starting " + self.name)
+      fetch_url_first_frame(self.base_url, self.name, self.downlood_path, self.overwrite)
+      print ("Exiting " + self.name)
 
 
 if __name__ == '__main__':
