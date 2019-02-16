@@ -1,6 +1,7 @@
 # Assignment: Identify cars parked in the spot marked 
 
 ## Sections
+#### Required Steps
 
 ### Camera Outside Overlooking Street:
  - [x] Rigidly mounted. 
@@ -10,5 +11,5 @@
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTQxMTQwMTU4MCwtMTE4MDQ1Mzk0Nl19
+eyJoaXN0b3J5IjpbMTI0NzY4MjM4OCwtMTE4MDQ1Mzk0Nl19
 -->
