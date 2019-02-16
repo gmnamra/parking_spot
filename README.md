@@ -3,8 +3,11 @@
 ## Sections
 ### Required Steps
 #### Fetch and Extract
-##### 
+##### basic
+##### Improvements
 #### Extract Car Using Yolov3
+#### basic
+##### Improvements
 #### Same Car
 #### All together
 
@@ -19,6 +22,6 @@
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTk4MDg4NTM3NiwtMTAwODkxNTIzMiwtMT
+eyJoaXN0b3J5IjpbMTIwNzI4Njc3MCwtMTAwODkxNTIzMiwtMT
 E4MDQ1Mzk0Nl19
 -->
