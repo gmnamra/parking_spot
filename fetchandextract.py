@@ -1,12 +1,11 @@
-import time
+
 import cv2
 import argparse
 import os
 import requests
 from pathlib import Path
-
 import threading
-import time
+
 
 
 def arg_parse():
