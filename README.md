@@ -4,12 +4,13 @@
 
  1. Camera Outside Overlooking Street:
  - [ ] Rigidly mounted. 
- - [ ] Capture parameters
- - [ ] Camera / Viewing pose  
+ - [ ] Capture parameters set. 
+ - [ ] Camera / Viewing pose set.
 
  
 
  ... a camera outside overlooking a street. The parking spots have a time limit of several hours. You have access to approximately two weeks of low-res video footage. ​Your task is to identify cars parked in the spot marked below.
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbNDU3OTI1Njk0LC0xMTgwNDUzOTQ2XX0=
+eyJoaXN0b3J5IjpbLTE0MDExMjQzNzAsLTExODA0NTM5NDZdfQ
+==
 -->
