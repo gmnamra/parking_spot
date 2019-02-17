@@ -1,10 +1,11 @@
 # Assignment: Identify cars parked in the spot marked 
 
 ## Sections
+### How to build & Run
 ### Steps
 #### Fetch and Extract
 ##### basic
-
+fetch-and-extract.sh 
 ##### Improvements
 #### Extract Car Using Yolov3
 ##### basic
@@ -27,6 +28,6 @@
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMjE2MzE4MDMwLC05NDQyMzcxMiwtOTM4Nj
+eyJoaXN0b3J5IjpbNzY3MDczMDAwLC05NDQyMzcxMiwtOTM4Nj
 gxOTc1LC0xMDA4OTE1MjMyLC0xMTgwNDUzOTQ2XX0=
 -->
