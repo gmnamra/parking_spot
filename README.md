@@ -10,7 +10,7 @@ fetch-and-extract.sh calls a python script to download the video file, open and 
 ###### Threading
 Implementation python file: fetchandextract.py contains and implementation of threaded downloader class derived from threading.thread class. The constructor takes the above download information and calls the same python method to download the file but *runs it in its own thread* thus allowing us to download multiple video files simultaneously. 
 ###### Video File Storage
-File system response 
+Handling large number of extractions can potentially File system response can be come an issue
 #### Extract Car Using Yolov3
 ##### basic
 ##### Improvements
@@ -32,6 +32,6 @@ File system response
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTg1MTQzNTMyOSwtOTQ0MjM3MTIsLTkzOD
+eyJoaXN0b3J5IjpbLTkwMDIwNTk4OSwtOTQ0MjM3MTIsLTkzOD
 Y4MTk3NSwtMTAwODkxNTIzMiwtMTE4MDQ1Mzk0Nl19
 -->
