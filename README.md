@@ -5,7 +5,7 @@
 ### Steps
 #### Fetch and Extract
 ##### basic
-fetch-and-extract.sh 
+fetch-and-extract.sh calls a python script to download the video file, open and extract the first frame. Both video and image file are downloaded a
 ##### Improvements
 #### Extract Car Using Yolov3
 ##### basic
@@ -28,6 +28,6 @@ fetch-and-extract.sh
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbNzY3MDczMDAwLC05NDQyMzcxMiwtOTM4Nj
-gxOTc1LC0xMDA4OTE1MjMyLC0xMTgwNDUzOTQ2XX0=
+eyJoaXN0b3J5IjpbLTEzNDEyMTE2MzQsLTk0NDIzNzEyLC05Mz
+g2ODE5NzUsLTEwMDg5MTUyMzIsLTExODA0NTM5NDZdfQ==
 -->
