@@ -1,11 +1,11 @@
 
-import cv2
+import cv2 as cv
 import argparse
 import os
 import requests
 from pathlib import Path
 import threading
-
+import sys
 
 
 def arg_parse():
@@ -33,23 +33,26 @@ def get_filename(filename):
 
 def fetch_url_first_frame(base_url, filename, download_path, overwrite=False):
     url = base_url + os.sep + filename
-    download_fqfn = download_path + os.sep + filename
-    ff_name = download_fqfn[:-2] + 'jpg'
+    ff_name = filename[:-2] + 'jpg'
+    download_fqfn = download_path + os.sep + ff_name
     donot_overwrite = not overwrite
-    exists = Path(ff_name).exists() and donot_overwrite
+    exists = Path(download_fqfn).exists() and donot_overwrite
     if not exists:
+        msg = 'downloading ' + url + '...'
+        print(msg)
         response = requests.get(url)
         content_type = response.headers['Content-Type'].split('/')[-1]
         with open(download_fqfn, 'wb') as f:
             f.write(response.content)
 
-        cap = cv2.VideoCapture(download_fqfn)
+        cap = cv.VideoCapture(download_fqfn)
         while cap.isOpened():
 
             ret, frame = cap.read()
             if ret:
                 orig_im = frame
-                cv2.imwrite(ff_name, orig_im)
+                cv.imwrite(ff_name, orig_im)
+                print('extracting...' + ff_name)
             break
     return (download_fqfn, ff_name)
 
@@ -71,7 +74,6 @@ class fetcherThread (threading.Thread):
 
 
 if __name__ == '__main__':
-    url = 'https://hiring.verkada.com/video'
-    filename = '1539326113.ts'
-    file = fetch_url_first_frame(url, filename, '/Users/arman/tmp/')
-    print(file)
+    url = sys.argv[1]
+    filename = sys.argv[2]
+    file = fetch_url_first_frame(url, filename, './__down_loads__')
