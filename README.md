@@ -5,7 +5,7 @@
 ### Steps
 #### Fetch and Extract
 ##### basic
-fetch-and-extract.sh calls a python script to download the video file, open and extract the first frame. Both video and image file are downloaded to a default folder where the script first checks to see if the video file has already been downloaded. 
+fetch-and-extract.sh calls a python script to download the video file, open and extract the first frame. Both video and image file are downloaded to a default folder where the script first checks to see if the video file as well as the first frame have already been downloaded. 
 ##### Improvements
 #### Extract Car Using Yolov3
 ##### basic
@@ -28,6 +28,6 @@ fetch-and-extract.sh calls a python script to download the video file, open and 
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbOTAzMTI4Mjg0LC05NDQyMzcxMiwtOTM4Nj
-gxOTc1LC0xMDA4OTE1MjMyLC0xMTgwNDUzOTQ2XX0=
+eyJoaXN0b3J5IjpbLTM3NzExNzI2MiwtOTQ0MjM3MTIsLTkzOD
+Y4MTk3NSwtMTAwODkxNTIzMiwtMTE4MDQ1Mzk0Nl19
 -->
