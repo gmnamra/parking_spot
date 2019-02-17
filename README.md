@@ -8,7 +8,7 @@
 fetch-and-extract.sh calls a python script to download the video file, open and extract the first frame. Both video and image file are downloaded to a default folder where the script first checks to see if the video file as well as the first frame have already been downloaded. Python script uses *htmllistparse* to generate a list of files available and *requests* lib to initiate tcp connection and follow it up with writing arrived data to a local file. 
 ##### Improvements
 ###### Threading
-fetchandextract
+Implementation python file: fetchandextract.py contains and implementation of threaded downloader class derived from 
 #### Extract Car Using Yolov3
 ##### basic
 ##### Improvements
@@ -30,6 +30,6 @@ fetchandextract
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTk5OTUyOTg5MCwtOTQ0MjM3MTIsLTkzOD
+eyJoaXN0b3J5IjpbMjAxODQzNDM2MywtOTQ0MjM3MTIsLTkzOD
 Y4MTk3NSwtMTAwODkxNTIzMiwtMTE4MDQ1Mzk0Nl19
 -->
