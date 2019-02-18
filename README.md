@@ -13,11 +13,11 @@ Implementation python file: fetchandextract.py contains and implementation of th
 In dealing with a large number of extractions, a better choice of video file temporary storage is OS's shared memory ( files stored in memory ). 
 ###### Concurrent downloading and preprocessing
 		
-#### has-caar Using Yolov3
+#### has-car *Using Yolov3*
 ##### basic
 
 ##### Improvements
-#### Same Car
+#### same-car *Using Yolov3*
 ##### basic
 ##### Improvements
 #### All together
@@ -35,7 +35,7 @@ In dealing with a large number of extractions, a better choice of video file tem
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTg4OTg1OTIwLC0xMDAzNzExMzk1LC05ND
-QyMzcxMiwtOTM4NjgxOTc1LC0xMDA4OTE1MjMyLC0xMTgwNDUz
-OTQ2XX0=
+eyJoaXN0b3J5IjpbLTgwOTE1NjQ3MiwtMTAwMzcxMTM5NSwtOT
+Q0MjM3MTIsLTkzODY4MTk3NSwtMTAwODkxNTIzMiwtMTE4MDQ1
+Mzk0Nl19
 -->
