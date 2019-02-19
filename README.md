@@ -1,3 +1,4 @@
+
 # Assignment: Identify cars parked in the marked spot 
 
 ## General
@@ -64,10 +65,3 @@ In dealing with a large number of extractions, a better choice of video file tem
  -  Capture parameters set. 
  -  Camera / Viewing pose set.
  -  Spot marked center at TL (235,235)
-
-
-<!--stackedit_data:
-eyJoaXN0b3J5IjpbLTgwOTE1NjQ3MiwtMTAwMzcxMTM5NSwtOT
-Q0MjM3MTIsLTkzODY4MTk3NSwtMTAwODkxNTIzMiwtMTE4MDQ1
-Mzk0Nl19
--->
