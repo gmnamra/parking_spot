@@ -7,17 +7,20 @@ from pathlib import Path
 from defaults import parkingSpot
 import match
 
+
 # Initialize the parameters
 confThreshold = 0.5  # Confidence threshold
 nmsThreshold = 0.4  # Non-maximum suppression threshold
-inpWidth = 416  # Width of network's input image
-inpHeight = 416  # Height of network's input image
+iouThreshold = 0.4
+inpWidth = 160  # Width of network's input image
+inpHeight = 160  # Height of network's input image
 
 # Load names of classes
 classesFile = "coco.names";
 classes = None
 with open(classesFile, 'rt') as f:
     classes = f.read().rstrip('\n').split('\n')
+carClassIndex = classes.index('car')
 
 # Give the configuration and weight files for the model and load the network using them.
 modelConfiguration = "yolov3.cfg";
@@ -77,6 +80,8 @@ def postprocess(frame, outs, parkingSpot, show):
         for detection in out:
             scores = detection[5:]
             classId = np.argmax(scores)
+            if not classId == carClassIndex:
+                continue
             confidence = scores[classId]
             if confidence > confThreshold:
                 center_x = int(detection[0] * frameWidth)
@@ -88,8 +93,8 @@ def postprocess(frame, outs, parkingSpot, show):
                 top = int(center_y - height / 2)
                 bbox = [left, top, left + width, top + height]
                 iou = intersection_over_union(bbox, parkingSpot)
-                if iou < 0.5:
-                    continue
+                if iou < iouThreshold:
+                 continue
 
                 ious.append(iou)
                 classIds.append(classId)
@@ -120,8 +125,9 @@ def process(filename, show):
         cv.namedWindow(winName, cv.WINDOW_NORMAL)
 
     frame = cv.imread(filename)
-    #msg = 'running yolo3 on ' + filename
-    #print(msg)
+
+    msg = 'running yolo3 on ' + filename
+    print(msg)
 
     # Create a 4D blob from a frame.
     blob = cv.dnn.blobFromImage(frame, 1 / 255, (inpWidth, inpHeight), [0, 0, 0], 1, crop=False)
@@ -149,8 +155,8 @@ def process(filename, show):
 
 
 def compare(filename_a, filename_b, show=False):
-    yolo3_a = process(filename_a, False)
-    yolo3_b = process(filename_b, False)
+    yolo3_a = process(filename_a, show)
+    yolo3_b = process(filename_b, show)
     imga = cv.imread(filename_a)
     imgb = cv.imread(filename_b)
     # Crop at the spot
@@ -166,7 +172,9 @@ def compare(filename_a, filename_b, show=False):
     roi_a_wider = imga[parkingSpot[0]-5:parkingSpot[2]+5, parkingSpot[1]-5: parkingSpot[3]+5]
     res = match.find_template(roi_a_wider,roi_b)
 
-    return yolo3_a and yolo3_b and res[1] > 0.5
+    if yolo3_a or yolo3_b:
+        return res[1] > 0.5
+    return False
 
 
 
@@ -199,7 +207,7 @@ if __name__ == '__main__':
     elif len(files) == 3:
         is_same = compare(files[1], files[2], show)
         if not is_same:
-            print('Different Cards')
+            print('Different Cars')
         else:
             print('Same Cars')
 

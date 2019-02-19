@@ -1,16 +1,8 @@
 import cv2 as cv
 import numpy as np
-import array
-import random
 import unittest
 from matplotlib import pyplot as plt
-from matplotlib.ticker import NullFormatter
-from skimage import color
-from skimage import exposure
-from skimage import img_as_float
-from skimage import img_as_ubyte
-from skimage import io
-from skimage.io import imsave
+
 
 
 def mutual_information(hgram):
