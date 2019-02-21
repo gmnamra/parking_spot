@@ -26,7 +26,7 @@ def LabImage(bgr_image):
     return (L, a, b)
 
 
-def LabJointHistogram(L, a, b):
+def JointHistogram(a, b):
     #    print(str(np.min(a)) + '  ' + str(np.average(a)) + '  ' + str(np.max(a)))
     #    print(str(np.min(b)) + '  ' + str(np.average(b)) + '  ' + str(np.max(b)))
 
@@ -38,10 +38,7 @@ def LabJointHistogram(L, a, b):
     return (a.flatten(), b.flatten(), c)
 
 
-def LabMutualInformation(rgb_image, plotter=None):
-    lab_image = cv.cvtColor(rgb_image, cv.COLOR_RGB2LAB)
-    # Split LAB channels
-    L, a, b = cv.split(lab_image)
+def MutualInformation(a, b, plotter=None):
     hist_2d, x_edges, y_edges = np.histogram2d(a.ravel(), b.ravel(), bins=20)
     mu = mutual_information(hist_2d)
     if plotter != None:
@@ -105,27 +102,22 @@ def make_gauss(centre, amp, sig, shapdim):
     return gaussblob
 
 
-def mi_lab(imga, imgb):
+def mi_lum(imga, imgb):
     f, axs = plt.subplots(2, 3, figsize=(20, 10), frameon=False,
                           subplot_kw={'xticks': [], 'yticks': []})
     axs[0, 0].imshow(imga)
     axs[0, 1].imshow(imgb)
 
     (L, a, b) = LabImage(imga)
+    (LL, aa, bb) = LabImage(imgb)
 
-    (x, y, c) = LabJointHistogram(L, a, b)
+    (x, y, c) = JointHistogram(L, LL)
     axs[1, 0].scatter(x, y, marker='.', cmap='PuBu_r')
-    axs[1, 0].set_title(' A ')
+    axs[1, 0].set_title(' Luminance ')
     axs[1, 0].set_xlabel('b')
     axs[1, 0].set_ylabel('a')
 
-    (LL, aa, bb) = LabImage(imgb)
 
-    (x, y, c) = LabJointHistogram(LL, aa, bb)
-    axs[1, 1].scatter(x, y)
-    axs[1, 1].set_title(' B ')
-    axs[1, 1].set_xlabel('b')
-    axs[1, 1].set_ylabel('a')
 
     plt.autoscale
     plt.show()

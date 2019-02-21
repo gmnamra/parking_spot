@@ -45,6 +45,7 @@ In dealing with a large number of extractions, a better choice of video file tem
  -  Input image size: 416 by 416. 
  	
 ##### Issues
+		sensitivity to bounding box variations between cars. 
 		Clutter: Parked Car with door/trunk/etc open
 		Moved: 
 			 Car -> Same Car Partial  ( pulling in to parking spot )
@@ -57,28 +58,28 @@ In dealing with a large number of extractions, a better choice of video file tem
 		- the parking spot at tow different time point or,
 		- two different parking spots at same or different time points 
 		
-		Our DL model can only report if there is "anything" like a car in each spot. 
+	
+		Measuring Similarity 
 		Since the *viewing setup* is shared, the difference in appearances is constrained to minor translations 
 		and changes in **shape** due to changes in color and brightness. My approach to make our same-car approach invariant to the above 
 		is as follow:
 		- minor-movement and coarse comparison:
-			We use a template matching method to measure where and how well spot in one time/place point appears 
+			I use a template matching method to measure where and how well spot in one time/place point appears 
 			in the other. We use Normalized Correlation metric as it is invariant to linear changes in contrast.
 			We will convert the 3 channel BGR image to a single channel gray. Same colors produce same gray however 
-			the difference is attenueted in gray. There are many good alternatives and we can assess them if sensitivity 
+			the distance between colors is attenueted in converted gray. There are many good alternatives and we can assess them if sensitivity 
 			is revealed as an issue. 
-		- to compare color signature I compute mutual information between color axis for each image. In other words, how does one color axis 
-			 is predicted by the other. Among color spaces, distance between colors are most correlated with human perception 
-			 in Lab color space. BGR images are converted to Lab color space. **L** represents the luminance channel as measured from a 
-			 reference white point. **a** and **b** are chromatic channels. 
-		
-		
-		
-		
-		
-		
+			
+			Specifically, the image roi in one image is matched in an expanded roi in the other image. A threshold of 0.5 is used. 
+			
+		Combining DL & Similarity
+			two cars are considered the same iff:
+				if DL detects a car in at least one of the two spots and image ROIs match better than similarity threshold
+			two cars are considered NOT the same car iff:
+				Regardless of DL results, if the image ROIs match lower than the image similarity threshold. 
+			
 ##### Issues
-		Possible sequential timestamp changes observed in the parking spot
+		Possible changes present in sequential timestamp captures of the parking spot
 			 Car -> Same Car Partial  ( pulling in to parking spot )
 			 Same Car Partial -> Empty  ( pulling in out of the parking spot )
 			 Parked Car -> Same Parked Car with door/trunk/etc open
@@ -86,8 +87,30 @@ In dealing with a large number of extractions, a better choice of video file tem
 
 
 #### analyze-cars.py 
-##### basic
-##### Improvements
+	analyze car applies has-car to every first frame extracted from videos in the time range. 
+##### basic	
+	A pipeline of two timestamps is used to validate the 
+	assessment using the is-same-car method above. A small simple state machine is used to run this pipeline and generate results. 
 
-#### Discussion
+#### Issues
+	
+
+#### Explorations
+		Parking Lot detection
+			Two patterns suggest a parking lot ( single floor and flat plane )
+				- Visible Boundary Lines separating spots
+				- Cars parked in row / column organization
+				
+				Visible Boundary lines can be detected robustly if correctly implemented 
+				Locations of multiple cars detected by DL/yolov3 can be processed to detect row / column organization
+			
+			Issues: 
+				Parked cars can obscure boundary lines.
+				Needs enough resolution for detecting boundary lines (8-16 pixels across)
+				Needs as many spots to have a good estimate of parking lot presence and location
+				
+
+	
+
+
 

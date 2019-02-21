@@ -13,8 +13,8 @@ from fetchandextract import fetch_first_frame
 confThreshold = 0.5  # Confidence threshold
 nmsThreshold = 0.4  # Non-maximum suppression threshold
 iouThreshold = 0.4
-inpWidth = 160  # Width of network's input image
-inpHeight = 160  # Height of network's input image
+inpWidth = 416  # Width of network's input image
+inpHeight = 416  # Height of network's input image
 
 # Load names of classes
 classesFile = "coco.names";
@@ -170,7 +170,7 @@ def compare(filename_a, filename_b, show=False):
 
     r = match.correlate(h_a, h_b)
     if show:
-        match.mi_lab(roi_a, roi_b)
+        match.mi_lum(roi_a, roi_b)
 
     roi_a_wider = imga[parkingSpot[0]-5:parkingSpot[2]+5, parkingSpot[1]-5: parkingSpot[3]+5]
     res = match.find_template(roi_a_wider,roi_b)
