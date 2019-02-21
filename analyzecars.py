@@ -1,14 +1,11 @@
 import argparse
 import os
 import requests
-from fetchandextract import fetch_url_first_frame
+from fetchandextract import fetch_first_frame
 from hascar import process
 from pathlib import Path
 from spot import SpotObserver
-
-BASEURL = 'https://hiring.verkada.com/video'
-##time.ctime(int("1284101485"))
-
+from common import __downloads_folder__ , __base_url__
 
 
 class analyzecars:
@@ -36,15 +33,16 @@ class analyzecars:
         # Instantiate a spot observer
         self.pp = SpotObserver()
 
-        dwp = Path('__down_loads__')
+        dwp = Path(__downloads_folder__)
         if not dwp.exists():
             dwp.mkdir()
 
         car = 'car'
         for idx, file in enumerate(self.batch):
-            down_info = fetch_url_first_frame(self.base_url, file, str(dwp))
-            found = process(down_info[1], False)
-            self.pp.update(found,self.nbatch[idx])
+            down_info = fetch_first_frame(file)
+            if down_info[0]:
+                found = process(down_info[1], False)
+                self.pp.update(found,self.nbatch[idx])
             # print(self.pp.report())
 
         self.pp.reportAll()
@@ -59,7 +57,7 @@ def main():
 
     args = parser.parse_args()
 
-    place = analyzecars(BASEURL, args.index, args.start, args.end)
+    place = analyzecars(__base_url__, args.index, args.start, args.end)
 
 
 if __name__ == '__main__':

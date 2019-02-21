@@ -1,4 +1,3 @@
-
 import cv2 as cv
 import argparse
 import os
@@ -6,6 +5,7 @@ import requests
 from pathlib import Path
 import threading
 import sys
+import common
 
 
 def arg_parse():
@@ -31,10 +31,14 @@ def get_filename(filename):
     return filename[slash + 1:]
 
 
-def fetch_url_first_frame(base_url, filename, download_path, overwrite=False):
+# @todo add frame index to be fetched
+def fetch_first_frame(fname, base_url=common.__base_url__, download_path=common.__downloads_folder__,
+                      overwrite=False):
+    pp = Path(fname)
+    filename = pp.stem + '.ts'
     url = base_url + os.sep + filename
-    ff_name = filename[:-2] + 'jpg'
-    download_fqfn = download_path + os.sep + ff_name
+    image_filename = filename[:-2] + 'jpg'
+    download_fqfn = download_path + os.sep + image_filename
     donot_overwrite = not overwrite
     exists = Path(download_fqfn).exists() and donot_overwrite
     if not exists:
@@ -51,29 +55,36 @@ def fetch_url_first_frame(base_url, filename, download_path, overwrite=False):
             ret, frame = cap.read()
             if ret:
                 orig_im = frame
-                cv.imwrite(ff_name, orig_im)
-                print('extracting...' + ff_name)
+                cv.imwrite(download_fqfn, orig_im)
+                print('extracting...' + image_filename)
             break
-    return (download_fqfn, ff_name)
+    else:
+        msg = 'Using Cached ' + image_filename
+        print(msg)
+
+    return (Path(download_fqfn).exists(), download_fqfn)
 
 
-class fetcherThread (threading.Thread):
-   def __init__(self, threadID, base_url, filename, download_path, overwrite=False):
-      threading.Thread.__init__(self)
-      self.threadID = threadID
-      self.base_url = base_url
-      self.name = filename
-      self.downlood_path = download_path
-      self.overwrite = overwrite
+class fetcherThread(threading.Thread):
+    def __init__(self, threadID, filename, base_url=common.__base_url__, download_path=common.__downloads_folder__,
+                 overwrite=False):
+        threading.Thread.__init__(self)
+        self.threadID = threadID
+        self.base_url = base_url
+        self.name = filename
+        self.downlood_path = download_path
+        self.overwrite = overwrite
 
-
-   def run(self):
-      print ("Starting " + self.name)
-      fetch_url_first_frame(self.base_url, self.name, self.downlood_path, self.overwrite)
-      print ("Exiting " + self.name)
+    def run(self):
+        print("Starting " + self.name)
+        fetch_first_frame(self.base_url, self.name, self.downlood_path, self.overwrite)
+        print("Exiting " + self.name)
 
 
 if __name__ == '__main__':
-    url = sys.argv[1]
-    filename = sys.argv[2]
-    file = fetch_url_first_frame(url, filename, './__down_loads__')
+    filename = sys.argv[1]
+    ok = fetch_first_frame(filename)
+    if not ok[0]: print('File name not recognized')
+    else: print(ok[1] + ' Downloaded and Cached here ')
+
+

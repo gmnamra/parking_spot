@@ -3,9 +3,10 @@ import cv2 as cv
 import sys
 import numpy as np
 from rectangle import intersection_over_union
-from pathlib import Path
-from defaults import parkingSpot
+from common import __this_spot__
 import match
+from fetchandextract import fetch_first_frame
+
 
 
 # Initialize the parameters
@@ -139,6 +140,7 @@ def process(filename, show):
     outs = net.forward(getOutputsNames(net))
 
     # Remove the bounding boxes with low confidence
+    parkingSpot = __this_spot__
     assessment = postprocess(frame, outs, parkingSpot, show)
 
     # Put efficiency information.
@@ -160,6 +162,7 @@ def compare(filename_a, filename_b, show=False):
     imga = cv.imread(filename_a)
     imgb = cv.imread(filename_b)
     # Crop at the spot
+    parkingSpot = __this_spot__
     roi_a = imga[parkingSpot[0]:parkingSpot[2], parkingSpot[1]: parkingSpot[3]]
     roi_b = imgb[parkingSpot[0]:parkingSpot[2], parkingSpot[1]: parkingSpot[3]]
     mi_a, h_a = match.LabMutualInformation(roi_a)
@@ -183,29 +186,32 @@ def compare(filename_a, filename_b, show=False):
 
 if __name__ == '__main__':
 
-    # image_filename_a = 'test_data/1538076223.jpg'
-    # image_filename_b = 'test_data/1538077514.jpg'
     # compare(image_filename_a, image_filename_b)
 
     show = False
     files = []
     options = []
+    exec_filename = sys.argv[0]
 
     for idx, arg in enumerate(sys.argv):
-        if Path(arg).is_file() and Path(arg).exists():
-            files.append(arg)
-        elif arg == 'show':
+        if arg == exec_filename: continue
+        if arg == 'show':
             options.append("show")
+            continue
+        ok = fetch_first_frame(arg)
+        if ok[0]:
+            files.append(ok[1])
+
 
     show = len(options) == 1
-    if len(files) == 2:
-        found = process(files[1], show)
+    if len(files) == 1:
+        found = process(files[0], show)
         if not found:
             print('no car detected')
         else:
             print('car detected')
-    elif len(files) == 3:
-        is_same = compare(files[1], files[2], show)
+    elif len(files) == 2:
+        is_same = compare(files[0], files[1], show)
         if not is_same:
             print('Different Cars')
         else:
