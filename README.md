@@ -15,7 +15,7 @@ numpy
 matplotlib**
 
 #### from the zip file
-Everything is in the folder. Asuuming that your python3 environment has the requirement you are ready to go. 
+Everything is in the folder except the weights. Run the shell script **getYOLOV3.sh**. Asuuming that your python3 environment has the requirement you are ready to go. 
 **Opencv 3
 numpy
 matplotlib**
@@ -79,6 +79,7 @@ In dealing with a large number of extractions, a better choice of video file tem
 			Specifically, the image roi in one image is matched in an expanded roi in the other image. A threshold of 0.5 is used. 
 			
 		Combining DL & Similarity
+
 			If both detection results are car, compute image similarity in a union of the two detection boxes. 
 				If they agree, report same other wise not same. 
 			If only one detection is car, then compute similarity of the detected box in the other image, if pass image similarity 
@@ -87,7 +88,11 @@ In dealing with a large number of extractions, a better choice of video file tem
 				not same car ( but we have validated empty !! )
 				if they do not agree, report not same car ( and we have an unvalidated empty !! )
 				
-				![alt text](figs/moving-in-parking)
+		    moving-in-parking.png and empty-vs-car.png both show two sequential time points first frames. The scatter plot below is
+			joint hisdtogram between the two. 
+			*moving-in-parking.png* shows how the location of the car in the midst of parking and the final parking are matched. 
+			*empty-vs-car* shows the difficulty of matching empty spot to one with a car. What is visible of the empty spot does match
+			and presents a false alarm in the joint histogram plot. 
 				
 ##### Issues
 		Possible changes present in sequential timestamp captures of the parking spot
@@ -108,39 +113,39 @@ Result of running streight yolov3 is in test_data directory under _0.txt. The re
 
 0     		   1538076175       pState.Empty
 
-1538076179     1538076227       pState.NewCar
+1538076179     1538076227       pState.NewCar  Ok
 
-1538076231     1538076235       pState.Empty
+1538076231     1538076235       pState.Empty   X ==> Trunk Open
 
-1538076239     1538076251       pState.NewCar
+1538076239     1538076251       pState.NewCar  Ok
 
-1538076255     1538076263       pState.Empty
+1538076255     1538076263       pState.Empty   X ==> Trunk Open
 
-1538076267     1538076311       pState.NewCar
+1538076267     1538076311       pState.NewCar  OK
 
-1538076315     1538076319       pState.Empty
+1538076315     1538076319       pState.Empty   X ==> Obstruction by a passing car
 
-1538076323     1538076343       pState.NewCar
+1538076323     1538076343       pState.NewCar  OK
 
-1538076347     1538076343       pState.Empty
+1538076347     1538076343       pState.Empty   X ==> 2 Persons standing next to the car
 
-1538076351     1538076483       pState.NewCar
+1538076351     1538076483       pState.NewCar  OK
 
-1538076487     1538076483       pState.Empty
+1538076487     1538076483       pState.Empty   X ==>  Passing Car
 
-1538076491     1538076916       pState.NewCar
+1538076491     1538076916       pState.NewCar  OK
 
-1538076919     1538076916       pState.Empty
+1538076919     1538076916       pState.Empty   X ==> Van Passing
 
-1538076923     1538077279       pState.NewCar
+1538076923     1538077279       pState.NewCar  OK
 
-1538077283     1538077279       pState.Empty
+1538077283     1538077279       pState.Empty   X ==> Van Passing
 
-1538077287     1538077878       pState.NewCar
+1538077287     1538077878       pState.NewCar  X ==> Car moving out
 
-1538077882     1538077954       pState.Empty
+1538077882     1538077954       pState.Empty   Ok
 
-1538077958     1538078202       pState.NewCar
+1538077958     1538078202       pState.NewCar  Ok
 	
 
 #### Explorations
