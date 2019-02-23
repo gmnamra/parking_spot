@@ -5,14 +5,20 @@
 Please follow the setup section carefully. The steps in the Scripts section correpond to the steps outlined in the cv-assignment. Improvements and issues are listed and discussed in each section. Video files and frames extracted from stored and cached in an internal download directory. Referencing them is exactly as specified in the assignment. 
 
 
+
 ### Setup 
+#### from the repository
 yolov3.weights is in the repository of this solution ( through Large File Size support). Additionally https://hiring.verkada.com/video/index.txt is downloaded if it is needed. A copy downloaded earlier is in the repository. 
 The following python3 packages are required
 **Opencv 3
 numpy
 matplotlib**
 
-
+#### from the zip file
+Everything is in the folder. Asuuming that your python3 environment has the requirement you are ready to go. 
+**Opencv 3
+numpy
+matplotlib**
 ### Viewing Setup
 Camera Outside Overlooking Street:
  -  Rigidly mounted. 
@@ -73,11 +79,16 @@ In dealing with a large number of extractions, a better choice of video file tem
 			Specifically, the image roi in one image is matched in an expanded roi in the other image. A threshold of 0.5 is used. 
 			
 		Combining DL & Similarity
-			two cars are considered the same iff:
-				if DL detects a car in at least one of the two spots and image ROIs match better than similarity threshold
-			two cars are considered NOT the same car iff:
-				Regardless of DL results, if the image ROIs match lower than the image similarity threshold. 
-			
+			If both detection results are car, compute image similarity in a union of the two detection boxes. 
+				If they agree, report same other wise not same. 
+			If only one detection is car, then compute similarity of the detected box in the other image, if pass image similarity 
+				report same car
+			If neither detection results are car, compute image similarity in the parking spot roi, if they agree, report 
+				not same car ( but we have validated empty !! )
+				if they do not agree, report not same car ( and we have an unvalidated empty !! )
+				
+				![alt text](figs/moving-in-parking)
+				
 ##### Issues
 		Possible changes present in sequential timestamp captures of the parking spot
 			 Car -> Same Car Partial  ( pulling in to parking spot )
@@ -92,7 +103,44 @@ In dealing with a large number of extractions, a better choice of video file tem
 	A pipeline of two timestamps is used to validate the 
 	assessment using the is-same-car method above. A small simple state machine is used to run this pipeline and generate results. 
 
-#### Issues
+#### Results
+Result of running streight yolov3 is in test_data directory under _0.txt. The results of using the logic used here are below. 
+
+0     		   1538076175       pState.Empty
+
+1538076179     1538076227       pState.NewCar
+
+1538076231     1538076235       pState.Empty
+
+1538076239     1538076251       pState.NewCar
+
+1538076255     1538076263       pState.Empty
+
+1538076267     1538076311       pState.NewCar
+
+1538076315     1538076319       pState.Empty
+
+1538076323     1538076343       pState.NewCar
+
+1538076347     1538076343       pState.Empty
+
+1538076351     1538076483       pState.NewCar
+
+1538076487     1538076483       pState.Empty
+
+1538076491     1538076916       pState.NewCar
+
+1538076919     1538076916       pState.Empty
+
+1538076923     1538077279       pState.NewCar
+
+1538077283     1538077279       pState.Empty
+
+1538077287     1538077878       pState.NewCar
+
+1538077882     1538077954       pState.Empty
+
+1538077958     1538078202       pState.NewCar
 	
 
 #### Explorations

@@ -36,9 +36,14 @@ class SpotObserver(object):
     def records(self):
         return self._records
 
-    def reportAll(self):
+    def reportAllCTime(self):
         for r in self.records():
             output = time.ctime(r[0]) + '     ' + time.ctime(r[1]) + '       ' + str(r[2])
+            print(output)
+
+    def reportAll(self):
+        for r in self.records():
+            output = str(r[0]) + '     ' + str(r[1]) + '       ' + str(r[2])
             print(output)
 
     def report(self):

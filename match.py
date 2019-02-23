@@ -39,7 +39,7 @@ def JointHistogram(a, b):
 
 
 def MutualInformation(a, b, plotter=None):
-    hist_2d, x_edges, y_edges = np.histogram2d(a.ravel(), b.ravel(), bins=20)
+    hist_2d, x_edges, y_edges = np.histogram2d(a.ravel(), b.ravel(), bins=200)
     mu = mutual_information(hist_2d)
     if plotter != None:
         hist_2d_log = np.zeros(hist_2d.shape)

@@ -1,4 +1,3 @@
-
 import cv2 as cv
 import sys
 import numpy as np
@@ -6,7 +5,6 @@ from rectangle import intersection_over_union
 from common import __this_spot__
 import match
 from fetchandextract import fetch_first_frame
-
 
 
 # Initialize the parameters
@@ -32,15 +30,17 @@ net.setPreferableBackend(cv.dnn.DNN_BACKEND_OPENCV)
 net.setPreferableTarget(cv.dnn.DNN_TARGET_CPU)
 
 
-# Get the names of the output layers
+## Get the names of the output layers
+#
 def getOutputsNames(net):
     # Get the names of all the layers in the network
     layersNames = net.getLayerNames()
     # Get the names of the output layers, i.e. the layers with unconnected outputs
     return [layersNames[i[0] - 1] for i in net.getUnconnectedOutLayers()]
 
+## Documentation for drawPred
+#  draw the predicted bounding box
 
-# Draw the predicted bounding box
 def drawPred(frame, classId, conf, iou, left, top, right, bottom):
     # Draw a bounding box.
     cv.rectangle(frame, (left, top), (right, bottom), (255, 178, 50), 2)
@@ -63,8 +63,14 @@ def drawPred(frame, classId, conf, iou, left, top, right, bottom):
 
     cv.putText(frame, label, (left, top), cv.FONT_HERSHEY_TRIPLEX, 0.6, (0, 0, 0), 1)
 
+## Documentation for postprocess
+#
+#  postprocess takes in outputs of a network run.
+#  removed bounding boxes with low confidence using non-maxima suppression
+#  returns assessment, image and roi
+#
 
-# Remove the bounding boxes with low confidence using non-maxima suppression
+
 def postprocess(frame, outs, parkingSpot, show):
     frameHeight = frame.shape[0]
     frameWidth = frame.shape[1]
@@ -95,7 +101,7 @@ def postprocess(frame, outs, parkingSpot, show):
                 bbox = [left, top, left + width, top + height]
                 iou = intersection_over_union(bbox, parkingSpot)
                 if iou < iouThreshold:
-                 continue
+                    continue
 
                 ious.append(iou)
                 classIds.append(classId)
@@ -115,9 +121,15 @@ def postprocess(frame, outs, parkingSpot, show):
         height = box[3]
         if show:
             drawPred(frame, classIds[i], confidences[i], ious[i], left, top, left + width, top + height)
-        return True
-    return False
+        return (True, (left, top, left + width, top + height))
+    return (False, None)
 
+## Documentation for process
+#
+#  process runs yolov3 and returns assessment and corresponding bounding box
+#  it calls postprocess to appraise results of the network run
+#
+#
 
 def process(filename, show):
     # Process inputs
@@ -141,46 +153,68 @@ def process(filename, show):
 
     # Remove the bounding boxes with low confidence
     parkingSpot = __this_spot__
-    assessment = postprocess(frame, outs, parkingSpot, show)
+    result = postprocess(frame, outs, parkingSpot, show)
 
-    # Put efficiency information.
+    # @todo: Put efficiency information.
     # The function getPerfProfile returns the overall time for inference(t) and
     # the timings for each of the layers(in layersTimes)
     if show:
+        display = frame.copy()
         t, _ = net.getPerfProfile()
         label = 'Inference time: %.2f ms' % (t * 1000.0 / cv.getTickFrequency())
-        cv.putText(frame, label, (0, 15), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255))
-        cv.rectangle(frame, (parkingSpot[0],parkingSpot[1]), (parkingSpot[2], parkingSpot[3]), (50, 255, 50), 3)
+        cv.putText(display, label, (0, 15), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255))
+        cv.rectangle(display, (parkingSpot[0], parkingSpot[1]), (parkingSpot[2], parkingSpot[3]), (50, 255, 50), 3)
+        if result[0]:
+            box = result[1]
+            cv.rectangle(display, (box[0], box[1]), (box[2], box[3]), (0, 25, 255), 3)
         while cv.waitKey(1) < 0:
-            cv.imshow(winName, frame)
-    return assessment
+            cv.imshow(winName, display)
+    return (result[0], frame, result[1])
 
+## Documentation for compare
+#
+#  compares result of two process results and returns a validated / verified result
+#  assumes two process results are sequential in time
+#  return similarity assessment between the two time points
+#
 
-def compare(filename_a, filename_b, show=False):
-    yolo3_a = process(filename_a, show)
-    yolo3_b = process(filename_b, show)
-    imga = cv.imread(filename_a)
-    imgb = cv.imread(filename_b)
-    # Crop at the spot
+def compare(out_a, out_b, show=False):
     parkingSpot = __this_spot__
-    roi_a = imga[parkingSpot[0]:parkingSpot[2], parkingSpot[1]: parkingSpot[3]]
-    roi_b = imgb[parkingSpot[0]:parkingSpot[2], parkingSpot[1]: parkingSpot[3]]
-    mi_a, h_a = match.LabMutualInformation(roi_a)
-    mi_b, h_b = match.LabMutualInformation(roi_b)
+    yolo3_a = out_a[0]
+    yolo3_b = out_b[0]
+    imga = out_a[1]
+    imgb = out_b[1]
+    box_a = out_a[2]
+    box_b = out_b[2]
+    has_box_a = box_a != None
+    has_box_b = box_b != None
+    if not has_box_a and not has_box_a:
+        box_a = parkingSpot
+        box_b = parkingSpot
+    elif has_box_a and not has_box_b:
+        box_b = box_a
+    elif has_box_b and not has_box_a:
+        box_a = box_b
+    else:
+        left = min(box_a[0], box_b[0])
+        top = min(box_a[1], box_b[1])
+        right = max(box_a[2], box_b[2])
+        bottom = max(box_a[3], box_b[3])
+        box_a = (left, top, right, bottom)
+        box_b = box_a
 
-    r = match.correlate(h_a, h_b)
+    # Crop at the spot
+    roi_a = imga[box_a[0]:box_a[2], box_a[1]:box_a[3]]
+    roi_b = imgb[box_b[0]:box_b[2], box_b[1]:box_b[3]]
+    mi_a, h_a = match.MutualInformation(roi_a, roi_b)
+
     if show:
         match.mi_lum(roi_a, roi_b)
 
-    roi_a_wider = imga[parkingSpot[0]-5:parkingSpot[2]+5, parkingSpot[1]-5: parkingSpot[3]+5]
-    res = match.find_template(roi_a_wider,roi_b)
+    roi_a_wider = imga[box_a[0] - 5:box_a[2] + 5, box_a[1] - 5: box_a[3] + 5]
+    res = match.find_template(roi_a_wider, roi_b)
 
-    if yolo3_a or yolo3_b:
-        return res[1] > 0.5
-    return False
-
-
-
+    return (res[1] > 0.5 and mi_a > 0.55) or mi_a > 1.0
 
 
 
@@ -202,7 +236,6 @@ if __name__ == '__main__':
         if ok[0]:
             files.append(ok[1])
 
-
     show = len(options) == 1
     if len(files) == 1:
         found = process(files[0], show)
@@ -211,10 +244,11 @@ if __name__ == '__main__':
         else:
             print('car detected')
     elif len(files) == 2:
-        is_same = compare(files[0], files[1], show)
+        out_a = process(files[0], show)
+        out_b = process(files[1], show)
+
+        is_same = compare(out_a, out_b, show)
         if not is_same:
             print('Different Cars')
         else:
             print('Same Cars')
-
-
